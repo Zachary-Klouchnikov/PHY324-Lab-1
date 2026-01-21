@@ -24,6 +24,16 @@ def linear_fit(x, m, b):
 
     return m * x + b
 
+def quadratic_fit(x, a):
+    """A quadratic fit function.
+
+    Arguments:
+    x -- independent variable
+    a -- quadratic coefficient
+    """
+
+    return a * x ** 2
+
 """
 ANALYSIS OF GLYCERINE DATA
 """
@@ -186,7 +196,7 @@ for key in glycerine_path[5 : 10]:
     filtered_position = position[filtered_indices]
 
     # Fitting data to linear function and storing parameters
-    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position)
+    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position, sigma = bead_diameters['bead_2'][1] / 2)
     slopes.append(popt[0])
     slope_err.append(np.sqrt(np.diag(pcov))[0])
     intercepts.append(popt[1])
@@ -229,7 +239,7 @@ for key in glycerine_path[10 : 15]:
     filtered_position = position[filtered_indices]
 
     # Fitting data to linear function and storing parameters
-    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position)
+    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position, sigma = bead_diameters['bead_3'][1] / 2)
     slopes.append(popt[0])
     slope_err.append(np.sqrt(np.diag(pcov))[0])
     intercepts.append(popt[1])
@@ -272,7 +282,7 @@ for key in glycerine_path[15 : 20]:
     filtered_position = position[filtered_indices]
 
     # Fitting data to linear function and storing parameters
-    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position)
+    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position, sigma = bead_diameters['bead_4'][1] / 2)
     slopes.append(popt[0])
     slope_err.append(np.sqrt(np.diag(pcov))[0])
     intercepts.append(popt[1])
@@ -315,7 +325,7 @@ for key in glycerine_path[20 : 25]:
     filtered_position = position[filtered_indices]
 
     # Fitting data to linear function and storing parameters
-    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position)
+    popt, pcov = curve_fit(linear_fit, filtered_time, filtered_position, sigma = bead_diameters['bead_5'][1] / 2)
     slopes.append(popt[0])
     slope_err.append(np.sqrt(np.diag(pcov))[0])
     intercepts.append(popt[1])
@@ -351,9 +361,8 @@ plt.errorbar(bead_diameters['bead_4'][0] / 2, terminal_velocities[3], xerr = bea
 plt.errorbar(bead_diameters['bead_5'][0] / 2, terminal_velocities[4], xerr = bead_diameters['bead_5'][1] / 2, yerr = velocity_errors[4], fmt = 'o', ms = 3.0, label = f'Bead 5')
 
 # Theoretical prediction
-rho = 1.26 # g/mm^3
-eta = 9.34 # gmm^-1s^-1
-plt.plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], rho * np.array([(bead_diameters[f'bead_{i}'][0] / 2) * terminal_velocities[j - 1] for i in range(1, 6)], dtype = float) / eta, linestyle = '--', color = 'black', label = 'Theoretical Prediction')
+popt, pcov = curve_fit(quadratic_fit, [bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], terminal_velocities, sigma = velocity_errors)
+plt.plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0]), color = 'black', linestyle = '--', label = f'Theoretical Prediction: y = {popt[0]:.2f}r2')
 
 # Labels
 plt.title('Terminal Velocity vs Bead Radius', fontsize = 12)
