@@ -24,7 +24,7 @@ def linear_fit(x, m, b):
 
     return m * x + b
 
-def quadratic_fit(x, a, b, c):
+def quadratic_fit(x, a, b):
     """A quadratic fit function.
 
     Arguments:
@@ -32,9 +32,9 @@ def quadratic_fit(x, a, b, c):
     a -- quadratic coefficient
     """
 
-    return (a * (x ** 2)) + (b * x) + c
+    return (a * (x ** 2)) + (b * x)
 
-def quadratic_fit_error_propagation(x, x_err, a, a_err, b, b_err, c_err):
+def quadratic_fit_error_propagation(x, x_err, a, a_err, b, b_err):
     """Calculates the uncertainty in a quadratic fit function.
 
     Arguments:
@@ -47,7 +47,7 @@ def quadratic_fit_error_propagation(x, x_err, a, a_err, b, b_err, c_err):
     c_err -- uncertainty in constant term
     """
 
-    return np.sqrt(quadratic_fit_lite_error_propagation(x, x_err, a, a_err) ** 2 + ((b * x) * np.sqrt((x_err / x) ** 2 + (b_err / b) ** 2)) ** 2 + (c_err) ** 2)
+    return np.sqrt(quadratic_fit_lite_error_propagation(x, x_err, a, a_err) ** 2 + ((b * x) * np.sqrt((x_err / x) ** 2 + (b_err / b) ** 2)) ** 2)
 
 def quadratic_fit_lite(x, a):
     """A quadratic fit function.
@@ -461,7 +461,7 @@ plt.show()
 "Plotting Terminal Velocity as a Function of Bead Radius"
 fig, axes = plt.subplots(nrows = 3, ncols = 1, sharex = True, gridspec_kw = {'hspace': 0, 'height_ratios': [3, 1, 1]}, figsize = (10, 7))
 
-effective_error = np.sqrt(np.array(velocity_errors) ** 2 + (0.18) ** 2)
+effective_error = np.sqrt(np.array(velocity_errors) ** 2 + (0.41) ** 2)
 
 # Plotting terminal velocity as a function of bead radius
 axes[0].errorbar(bead_diameters[f'bead_1'][0] / 2, terminal_velocities[0], yerr = effective_error[0], fmt = 'o', ms = 3.0, color = colors[0], label = 'Derived Terminal Velocities of Beads')
@@ -477,10 +477,10 @@ axes[1].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], term
 axes[1].axhline(0, color = 'gray', linestyle = '--')
 
 popt, pcov = curve_fit(quadratic_fit, [bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], terminal_velocities, sigma = velocity_errors)
-chi2_reduced = reduced_chi_square(terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), effective_error, 3)
+chi2_reduced = reduced_chi_square(terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), effective_error, 3)
 
-axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r + ({popt[2]:.2f}$\\pm${np.sqrt(np.diag(pcov))[2]:.2f}) ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
-axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), yerr = np.sqrt((np.array(effective_error)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1], np.sqrt(np.diag(pcov))[2])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
+axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
+axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), yerr = np.sqrt((np.array(effective_error)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
 axes[2].axhline(0, color = 'gray', linestyle = '--')
 
 # Labels
@@ -506,7 +506,7 @@ corrected_terminal_velocities = [wall_effect_correction(terminal_velocities[i], 
 "Plotting Terminal Velocity as a Function of Bead Radius With Wall Effect Correction"
 fig, axes = plt.subplots(nrows = 3, ncols = 1, sharex = True, gridspec_kw = {'hspace': 0, 'height_ratios': [3, 1, 1]}, figsize = (10, 7))
 
-effective_error = np.sqrt(np.array(velocity_errors) ** 2 + (0.11) ** 2)
+effective_error = np.sqrt(np.array(velocity_errors) ** 2 + (0.14) ** 2)
 
 # Plotting terminal velocity as a function of bead radius with wall effect correction
 axes[0].errorbar(bead_diameters[f'bead_1'][0] / 2, terminal_velocities[0], yerr = effective_error[0], fmt = 'o', ms = 3.0, color = colors[0], label = 'Derived Terminal Velocities of Beads')
@@ -522,10 +522,10 @@ axes[1].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corr
 axes[1].axhline(0, color = 'gray', linestyle = '--')
 
 popt, pcov = curve_fit(quadratic_fit, [bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corrected_terminal_velocities, sigma = velocity_errors)
-chi2_reduced = reduced_chi_square(corrected_terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), np.array(effective_error), 3)
+chi2_reduced = reduced_chi_square(corrected_terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), np.array(effective_error), 2)
 
-axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r + ({popt[2]:.2f}$\\pm${np.sqrt(np.diag(pcov))[2]:.2f}) ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
-axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corrected_terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), yerr = np.sqrt((np.array(effective_error)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1], np.sqrt(np.diag(pcov))[2])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
+axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
+axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corrected_terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), yerr = np.sqrt((np.array(effective_error)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
 axes[2].axhline(0, color = 'gray', linestyle = '--')
 
 # Labels
@@ -563,10 +563,10 @@ axes[1].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], term
 axes[1].axhline(0, color = 'gray', linestyle = '--')
 
 popt, pcov = curve_fit(quadratic_fit, [bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], terminal_velocities, sigma = velocity_errors)
-chi2_reduced = reduced_chi_square(terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), np.array(velocity_errors), 3)
+chi2_reduced = reduced_chi_square(terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), np.array(velocity_errors), 2)
 
-axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r + ({popt[2]:.2f}$\\pm${np.sqrt(np.diag(pcov))[2]:.2f}) ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
-axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), yerr = np.sqrt((np.array(velocity_errors)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1], np.sqrt(np.diag(pcov))[2])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
+axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
+axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), yerr = np.sqrt((np.array(velocity_errors)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
 axes[2].axhline(0, color = 'gray', linestyle = '--')
 
 # Labels
@@ -606,10 +606,10 @@ axes[1].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corr
 axes[1].axhline(0, color = 'gray', linestyle = '--')
 
 popt, pcov = curve_fit(quadratic_fit, [bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corrected_terminal_velocities, sigma = velocity_errors)
-chi2_reduced = reduced_chi_square(corrected_terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), np.array(velocity_errors), 3)
+chi2_reduced = reduced_chi_square(corrected_terminal_velocities, quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), np.array(velocity_errors), 2)
 
-axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r + ({popt[2]:.2f}$\\pm${np.sqrt(np.diag(pcov))[2]:.2f}) ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
-axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corrected_terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1], popt[2]), yerr = np.sqrt((np.array(velocity_errors)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1], np.sqrt(np.diag(pcov))[2])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
+axes[0].plot([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), color = 'teal', linestyle = '--', label = f"Quadratic Fit: v$_{{term}}$ = ({popt[0]:.2f}$\\pm${np.sqrt(np.diag(pcov))[0]:.2f})r$^2$ + ({popt[1]:.2f}$\\pm${np.sqrt(np.diag(pcov))[1]:.2f})r ($\\chi_\\nu^2$ = {chi2_reduced:.2f})")
+axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corrected_terminal_velocities - quadratic_fit(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), popt[0], popt[1]), yerr = np.sqrt((np.array(velocity_errors)) ** 2 + (quadratic_fit_error_propagation(np.array([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)]), np.array([bead_diameters[f'bead_{i}'][1] / 2 for i in range(1, 6)]), popt[0], np.sqrt(np.diag(pcov))[0], popt[1], np.sqrt(np.diag(pcov))[1])) ** 2), fmt = 'o', capsize = 2, color = 'teal', label = 'Quadratic Fit Residuals')
 axes[2].axhline(0, color = 'gray', linestyle = '--')
 
 # Labels
