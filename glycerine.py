@@ -484,17 +484,17 @@ axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], term
 axes[2].axhline(0, color = 'gray', linestyle = '--')
 
 # Labels
-fig.suptitle("Terminal Velocity vs. Bead Radius", fontsize = 12)
-fig.supxlabel("Bead Radius (mm)", fontsize = 12)
-fig.supylabel("Terminal Velocity (mm/s)", fontsize = 12)
+fig.suptitle("Terminal Velocity vs. Bead Radius", fontsize = 18)
+fig.supxlabel("Bead Radius (mm)", fontsize = 18)
+fig.supylabel("Terminal Velocity (mm/s)", fontsize = 18)
 
-axes[0].legend(fontsize = 12)
+axes[0].legend(fontsize = 18)
 axes[0].grid()
 
-axes[1].legend(fontsize = 12)
+axes[1].legend(fontsize = 18)
 axes[1].grid()
 
-axes[2].legend(fontsize = 12)
+axes[2].legend(fontsize = 18)
 axes[2].grid()
 
 plt.tight_layout()
@@ -529,17 +529,17 @@ axes[2].errorbar([bead_diameters[f'bead_{i}'][0] / 2 for i in range(1, 6)], corr
 axes[2].axhline(0, color = 'gray', linestyle = '--')
 
 # Labels
-fig.suptitle("Terminal Velocity vs. Bead Radius With Wall Effect Correction", fontsize = 12)
-fig.supxlabel("Bead Radius (mm)", fontsize = 12)
-fig.supylabel("Terminal Velocity (mm/s)", fontsize = 12)
+fig.suptitle("Terminal Velocity vs. Bead Radius With Wall Effect Correction", fontsize = 18)
+fig.supxlabel("Bead Radius (mm)", fontsize = 18)
+fig.supylabel("Terminal Velocity (mm/s)", fontsize = 18)
 
-axes[0].legend(fontsize = 12)
+axes[0].legend(fontsize = 18)
 axes[0].grid()
 
-axes[1].legend(fontsize = 12)
+axes[1].legend(fontsize = 18)
 axes[1].grid()
 
-axes[2].legend(fontsize = 12)
+axes[2].legend(fontsize = 18)
 axes[2].grid()
 
 plt.tight_layout()
